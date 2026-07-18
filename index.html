@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Periodo Transitorio · Infantil B · UE Cornellà</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
+
+:root {
+  --pitch: #14301F;
+  --pitch-2: #1F4A30;
+  --gold: #F0B429;
+  --gold-deep: #9C6E0C;
+  --red: #C23B32;
+  --chalk: #F7F6F1;
+  --card: #FFFFFF;
+  --ink: #1B241D;
+  --muted: #767E71;
+  --line: #E4E1D6;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--pitch);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+body.modal-open { overflow: hidden; }
+
+.app-shell {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--chalk);
+  min-height: 100vh;
+  position: relative;
+}
+@media (min-width: 520px) {
+  body { padding: 24px 0; }
+  .app-shell { min-height: auto; border-radius: 22px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.35); }
+}
+
+/* HEADER */
+.app-header {
+  background: linear-gradient(160deg, var(--pitch) 0%, var(--pitch-2) 100%);
+  color: #fff;
+  padding: 22px 20px 26px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.app-header::after {
+  content: "";
+  position: absolute;
+  right: -40px; top: -60px;
+  width: 200px; height: 200px;
+  border: 2px solid rgba(240,180,41,0.14);
+  border-radius: 50%;
+}
+.crest { flex: none; width: 44px; height: 50px; position: relative; z-index: 1; }
+.header-text { position: relative; z-index: 1; min-width: 0; }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+.app-header h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 25px;
+  letter-spacing: 0.01em;
+  margin: 0;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.subtitle { font-size: 13px; color: rgba(255,255,255,0.72); margin-top: 3px; }
+
+/* TABS */
+.tabs {
+  display: flex;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 5;
+}
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 14px 2px 12px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+.tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+.tab-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+/* VIEWS */
+main { padding: 18px 16px 32px; }
+.view { display: none; }
+.view.active { display: block; animation: fadein .25s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(4px);} to { opacity:1; transform:none; } }
+
+.intro { font-size: 13.5px; color: var(--muted); margin: 2px 0 16px; line-height: 1.4; }
+
+h2 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+  margin: 4px 0 14px;
+}
+
+/* WEEK GRID / CALENDAR */
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.dow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-align: center;
+  color: var(--muted);
+  padding-bottom: 4px;
+  text-transform: uppercase;
+}
+.day-cell {
+  aspect-ratio: 1 / 1.05;
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: #EFEDE4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 4px 2px;
+  color: var(--muted);
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .12s ease;
+}
+.day-cell:active { transform: scale(0.94); }
+.day-cell:focus-visible { outline: 2px solid var(--pitch); outline-offset: 2px; }
+.day-cell.blank { background: none; cursor: default; }
+.day-cell .daynum { font-size: 11px; font-weight: 600; opacity: .55; }
+
+.day-cell.session { background: var(--pitch); color: #fff; }
+.day-cell.session .daynum { color: rgba(255,255,255,0.55); }
+.day-cell.session .tile-num {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+.day-cell.session .tile-time {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.65);
+}
+.day-cell.rest .tile-rest {
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.day-cell.today { box-shadow: 0 0 0 2px var(--red); }
+
+.day-cell.entreno { background: #E4DCC3; color: var(--gold-deep); }
+.day-cell.entreno .tile-rest { color: var(--gold-deep); font-weight: 600; }
+.day-cell.entreno .daynum { opacity: .7; }
+.day-cell.fiesta .tile-rest { color: var(--muted); }
+.day-cell.partido, .day-cell.liga { background: var(--red); color: #fff; }
+.day-cell.partido .tile-rest, .day-cell.liga .tile-rest { color: #fff; font-weight: 600; }
+.day-cell.partido .daynum, .day-cell.liga .daynum { opacity: .75; }
+
+/* KICKOFF CARD */
+.kickoff-card {
+  background: var(--card);
+  border: 1px dashed var(--gold-deep);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  text-align: center;
+}
+.kickoff-label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.kickoff-date { font-family: var(--font-display); font-size: 17px; margin-top: 2px; color: var(--pitch); font-weight: 600; }
+
+/* MODAL / TICKET */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(20,48,31,0.55);
+  display: flex; align-items: flex-end;
+  z-index: 50;
+}
+.modal-overlay[hidden] { display: none; }
+@media (min-width: 520px) {
+  .modal-overlay { align-items: center; justify-content: center; }
+}
+.modal {
+  background: var(--chalk);
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 22px 22px 0 0;
+  position: relative;
+  animation: slideup .22s ease;
+}
+@media (min-width: 520px) {
+  .modal { max-width: 440px; border-radius: 22px; max-height: 82vh; }
+}
+@keyframes slideup { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,0.18);
+  font-size: 15px; color: #fff; cursor: pointer; z-index: 2;
+}
+
+.ticket-top {
+  display: flex; align-items: center; gap: 12px;
+  padding: 22px 20px 16px;
+  background: var(--pitch);
+  color: #fff;
+  border-radius: 22px 22px 0 0;
+}
+.ticket-num {
+  font-family: var(--font-display);
+  font-size: 34px; font-weight: 700;
+  color: var(--gold);
+  width: 48px; text-align: center; line-height: 1; flex: none;
+}
+.ticket-num.rest { color: rgba(255,255,255,0.5); font-size: 26px; }
+.ticket-num.entreno { color: var(--gold); font-size: 22px; }
+.ticket-num.fiesta { color: rgba(255,255,255,0.5); font-size: 26px; }
+.ticket-num.partido, .ticket-num.liga {
+  color: #fff; background: var(--red); border-radius: 50%;
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.ticket-meta { flex: 1; min-width: 0; }
+.ticket-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,0.6); }
+.ticket-date { font-family: var(--font-display); font-size: 16px; text-transform: capitalize; }
+.ticket-time { font-family: var(--font-mono); font-size: 13px; background: rgba(240,180,41,0.16); color: var(--gold); padding: 4px 8px; border-radius: 6px; flex: none; }
+
+.ticket-perf {
+  height: 0; border-top: 2px dashed rgba(20,48,31,0.18);
+  position: relative;
+}
+.ticket-perf::before, .ticket-perf::after {
+  content: ""; position: absolute; top: -8px;
+  width: 16px; height: 16px; background: var(--pitch); border-radius: 50%;
+}
+.ticket-perf::before { left: -8px; }
+.ticket-perf::after { right: -8px; }
+
+.ticket-body { padding: 18px 20px 26px; }
+
+.block { margin-bottom: 18px; }
+.block:last-child { margin-bottom: 0; }
+.block-h {
+  font-family: var(--font-display);
+  font-size: 13px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--pitch); margin-bottom: 6px;
+  padding-bottom: 5px; border-bottom: 1px solid var(--line);
+}
+.block-d, .main-line { font-size: 14px; line-height: 1.5; color: var(--ink); margin-bottom: 3px; }
+.alert-line {
+  font-size: 13px; font-weight: 600; color: var(--red);
+  background: rgba(194,59,50,0.08);
+  padding: 6px 10px; border-radius: 8px; margin: 6px 0;
+}
+.special-note {
+  font-size: 13.5px; font-style: italic; color: var(--pitch);
+  background: rgba(240,180,41,0.14);
+  border-left: 3px solid var(--gold);
+  padding: 10px 12px; border-radius: 0 8px 8px 0;
+  margin-bottom: 18px;
+}
+
+.ex-list { list-style: none; margin: 0; padding: 0; }
+.ex-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 0; border-bottom: 1px solid var(--line);
+}
+.ex-row:last-child { border-bottom: none; padding-bottom: 0; }
+.ex-idx { font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding-top: 3px; flex: none; }
+.ex-body { flex: 1; min-width: 0; }
+.ex-name { font-size: 14.5px; font-weight: 600; }
+.ex-note { font-size: 12px; font-style: italic; color: var(--muted); margin-top: 1px; }
+.ex-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.pill {
+  font-family: var(--font-mono);
+  font-size: 11px; padding: 3px 8px; border-radius: 20px;
+  background: #EFEDE4; color: var(--ink);
+}
+.pill-r { background: rgba(20,48,31,0.08); color: var(--pitch); font-weight: 600; }
+.ex-video {
+  flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  text-decoration: none; color: var(--red);
+  font-size: 15px; padding-top: 2px;
+}
+.ex-video span { font-size: 9px; text-transform: uppercase; letter-spacing: .03em; }
+
+.rest-copy { font-size: 14px; line-height: 1.55; color: var(--ink); margin: 0 0 16px; }
+
+.protocol-block { border-top: 1px solid var(--line); padding-top: 14px; }
+.protocol-toggle {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: none; border: none; padding: 0; margin: 0; cursor: pointer; text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.protocol-toggle .block-h { flex: 1; }
+.protocol-toggle:active { opacity: 0.6; }
+.protocol-toggle:focus-visible { outline: 2px solid var(--pitch); outline-offset: 2px; }
+.protocol-count { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+.protocol-chevron {
+  font-family: var(--font-mono); font-size: 11.5px; color: var(--red); flex: none; padding-bottom: 5px;
+}
+.protocol-body { margin-top: 10px; }
+
+/* RECOMENDACIONES */
+.recs-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.rec-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md);
+  padding: 13px 14px;
+}
+.rec-t { font-family: var(--font-display); font-size: 13px; text-transform: uppercase; color: var(--pitch); margin-bottom: 3px; }
+.rec-d { font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+.importante-card {
+  background: var(--pitch); color: #fff; border-radius: var(--radius-md);
+  padding: 16px;
+}
+.importante-h { font-family: var(--font-display); color: var(--gold); text-transform: uppercase; font-size: 13px; margin-bottom: 6px; }
+.importante-card p { font-size: 13.5px; line-height: 1.55; margin: 0; color: rgba(255,255,255,0.9); }
+
+/* LIBRARY */
+.lib-search {
+  width: 100%; padding: 12px 14px; border-radius: var(--radius-md);
+  border: 1px solid var(--line); background: var(--card);
+  font-size: 14px; margin-bottom: 20px; font-family: var(--font-body);
+}
+.lib-search:focus-visible { outline: 2px solid var(--pitch); }
+.lib-group { margin-bottom: 22px; }
+.lib-group.lib-hidden { display: none; }
+.lib-h {
+  font-family: var(--font-display); font-size: 13px; text-transform: uppercase;
+  letter-spacing: .03em; color: var(--muted); margin: 0 0 8px;
+}
+.lib-items { display: flex; flex-direction: column; gap: 6px; }
+.lib-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 11px 12px; text-decoration: none; color: var(--ink);
+}
+.lib-item.lib-hidden { display: none; }
+.lib-name { flex: 1; font-size: 13.5px; font-weight: 500; }
+.lib-r { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.lib-play { color: var(--red); font-size: 13px; flex: none; }
+
+/* PRETEMPORADA INFO CARDS */
+.info-cards { display: flex; flex-direction: column; gap: 10px; }
+.info-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 13px 14px; }
+.info-h { font-family: var(--font-display); font-size: 12.5px; text-transform: uppercase; color: var(--pitch); margin-bottom: 3px; }
+.info-d { font-size: 13.5px; color: var(--ink); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 2px 0 18px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+.app-footer {
+  text-align: center; font-size: 11px; color: var(--muted);
+  padding: 4px 24px 22px; line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="app-header">
+    <svg class="crest" viewBox="0 0 46 52" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M23 1 L44 8 V25 C44 39 35 47.5 23 51 C11 47.5 2 39 2 25 V8 Z" fill="#0E2417" stroke="#F0B429" stroke-width="1.5"/>
+      <g clip-path="url(#crestClip)">
+        <rect x="-6" y="9" width="60" height="5" fill="#F0B429" transform="rotate(-18 23 25)"/>
+        <rect x="-6" y="19" width="60" height="5" fill="#C23B32" transform="rotate(-18 23 25)"/>
+        <rect x="-6" y="29" width="60" height="5" fill="#F0B429" transform="rotate(-18 23 25)"/>
+        <rect x="-6" y="39" width="60" height="5" fill="#C23B32" transform="rotate(-18 23 25)"/>
+      </g>
+      <circle cx="23" cy="30" r="6.5" fill="#F7F6F1" stroke="#0E2417" stroke-width="1"/>
+      <defs>
+        <clipPath id="crestClip">
+          <path d="M23 1 L44 8 V25 C44 39 35 47.5 23 51 C11 47.5 2 39 2 25 V8 Z"/>
+        </clipPath>
+      </defs>
+    </svg>
+    <div class="header-text">
+      <div class="eyebrow">UE Cornellà · Infantil B</div>
+      <h1>Periodo transitorio</h1>
+      <div class="subtitle">Temporada 2026&ndash;2027</div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" class="tab-btn active" data-target="view-calendario">Calendario</button>
+    <button type="button" class="tab-btn" data-target="view-consejos">Consejos</button>
+    <button type="button" class="tab-btn" data-target="view-biblioteca">Ejercicios</button>
+    <button type="button" class="tab-btn" data-target="view-pretemporada">Pretemporada</button>
+  </nav>
+
+  <main>
+
+    <section id="view-calendario" class="view active">
+      <p class="intro">Del 10 al 30 de agosto, 3 sesiones por semana. Toca un día para ver el calentamiento, el trabajo aeróbico y los ejercicios de fuerza con vídeo de cada uno.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:var(--pitch)"></span>Sesión</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#EFEDE4"></span>Descanso</span>
+      </div>
+      <div class="week-grid" id="calendar-grid"></div>
+      <div class="kickoff-card">
+        <div class="kickoff-label">Arranca la pretemporada</div>
+        <div class="kickoff-date">Lunes 31 de agosto · 19:00h</div>
+      </div>
+    </section>
+
+    <section id="view-consejos" class="view">
+      <h2>Recomendaciones básicas</h2>
+      <div id="recs-list" class="recs-list"></div>
+      <div class="importante-card">
+        <div class="importante-h">Importante</div>
+        <p id="importante-text"></p>
+      </div>
+    </section>
+
+    <section id="view-biblioteca" class="view">
+      <h2>Biblioteca de ejercicios</h2>
+      <input type="search" id="lib-search" class="lib-search" placeholder="Buscar un ejercicio…">
+
+      <div class="lib-group">
+        <h3 class="lib-h">De las 9 sesiones</h3>
+        <div class="lib-items" id="lib-sesiones"></div>
+      </div>
+      <div class="lib-group">
+        <h3 class="lib-h">Protocolo de prevención</h3>
+        <div class="lib-items" id="lib-prevencion"></div>
+      </div>
+      <div class="lib-group">
+        <h3 class="lib-h">Protocolo de fuerza general</h3>
+        <div class="lib-items" id="lib-fuerza"></div>
+      </div>
+      <div class="lib-group">
+        <h3 class="lib-h">Estiramientos</h3>
+        <div class="lib-items" id="lib-estiramientos"></div>
+      </div>
+    </section>
+
+    <section id="view-pretemporada" class="view">
+      <p class="intro">Del 31 de agosto al 4 de octubre. Fechas orientativas: los cambios se confirman por el grupo de WhatsApp.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#E4DCC3"></span>Entreno</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Partido / Liga</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#EFEDE4"></span>Descanso</span>
+      </div>
+      <div class="week-grid" id="pretemp-grid"></div>
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-h">Horario partido liga</div>
+          <div class="info-d">Sábados en el Mpal. Cornellà: 8:00h / 9:25h / 10:50h. Cabe la posibilidad de jugar en otro horario, día o instalación (Xaloc, etc.)</div>
+        </div>
+        <div class="info-card">
+          <div class="info-h">Vestuarios</div>
+          <div class="info-d">Lunes: pendiente · Martes y jueves: pendiente</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    Datos del planning oficial del club. Los botones de vídeo abren una búsqueda en YouTube del ejercicio.
+  </footer>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" hidden>
+  <div class="modal">
+    <button type="button" class="modal-close" id="modal-close" aria-label="Cerrar">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
